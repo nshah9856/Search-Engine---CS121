@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+   <title>Search Engine Results</title>
+   <style>
+      html, body{
+         height:100%;
+         width:100%;
+         padding:0;
+         margin:0;
+      }
+      table {
+         width:100%;
+      }
+      table, th, td {
+         border: 1px solid rgb(39, 36, 36);
+         border-collapse: collapse;
+      }
+      th, td {
+         padding: 15px;
+         text-align: left;
+      }
+      tr:nth-child(even) {
+         background-color: #eee;
+      }
+      tr:nth-child(odd) {
+         background-color: #fff;
+      }
+      th {
+         background-color: #e74c3c;
+         color: white;
+      }
+      #row:hover{
+         background-color: #dddddd;
+      }
+      /* table {
+         font-family: arial, sans-serif;
+         border-collapse: collapse;
+         width: 100%;
+      }
+      
+      td, th {
+         border: 1px solid #dddddd;
+         text-align: left;
+         padding: 8px;
+      }
+      
+      tr:nth-child(even) {
+         background-color: #dddddd;
+      } */
+   </style>
+   <body>
+      <table border = 1>
+         <tr>
+            <th>Title</th>
+            <th>Link</th>
+         </tr>   
+         {% for link, data in result: %}
+            <tr id="row">
+               <td>{{data['title']}}</td>
+               <td>
+                  <a target="_blank" href={{link}}>
+                     {{link}}
+                  </a>
+               </td>
+             </tr>
+            <!-- <p>
+                <a target="_blank" href={{link}}>
+                    {{data['title']}}
+                </a>
+            </p> -->
+               <!-- <th> {{ link }} </th>
+               <td> {{ data['title'] }} </td>
+            </tr> -->
+         {% endfor %}
+      </table>
+   </body>
+</html>

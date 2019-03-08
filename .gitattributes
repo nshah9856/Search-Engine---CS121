@@ -1,0 +1,2 @@
+Index.txt filter=lfs diff=lfs merge=lfs -text
+Document.txt filter=lfs diff=lfs merge=lfs -text
