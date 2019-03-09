@@ -79,7 +79,6 @@ def generate_index():
     """
         This function walks the directories and files and calls on normalize function to build the index.
     """
-    # count = 0
     TOTAL_DOCUMENTS = 0 
     for dirName, subdirList, fileList in os.walk(rootDir):
         dirNum = dirName[15:]
@@ -92,10 +91,6 @@ def generate_index():
                     TOTAL_DOCUMENTS += 1
                     normalize(fin, dirNum+'/'+fname)
 
-                # count += 1
-                # if count == 100:
-                #     return TOTAL_DOCUMENTS
-
     return TOTAL_DOCUMENTS
 
 def modify_index(TOTAL_DOCUMENTS): #Adding the tfidf to the Index
@@ -105,7 +100,7 @@ def modify_index(TOTAL_DOCUMENTS): #Adding the tfidf to the Index
     for k,v in GLOBAL_INDEX.items():
         dck = len(v)
         for i in v:
-            i.tfidf = (1 + math.log(i.tokenFrequency)) * math.log(TOTAL_DOCUMENTS/dck)
+            i.tfidf = math.fabs((1 + math.log(i.tokenFrequency)) * math.log(TOTAL_DOCUMENTS/dck))
 
 def write_index_to_file(TOTAL_DOCUMENTS): #Writing index to a file! AND gathering data
     """

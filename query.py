@@ -58,24 +58,6 @@ def query(s):
     with open(rootDir + 'bookkeeping.json') as book:
         data = json.load(book)
 
-    # with open("QueryResults.txt", "a") as dataFile:
-    #     print "Total Number of Documents : ", TOTAL_DOCUMENTS
-    #     dataFile.write("Total Number of Documents : {}".format(TOTAL_DOCUMENTS))
-        # while True:
-            # print
-            # s = raw_input("Enter the query: ")
-            # for s in search.split():
-            #     GLOBAL_INDEX[s]
-
-
-
-        # print "Searching..", s
-        # output = []
-        # print "\nTop 20 results\n"
-        # dataFile.write("\nQuery : {}\n".format(s))
-        results = 0
-
-
         #Cosine Similarity Method
         query_vector = []
 
@@ -89,38 +71,25 @@ def query(s):
 
         tf = Counter(modified_query)
 
-        results = defaultdict(float)
+        Scores = defaultdict(float)
+        Magnitude = defaultdict(float)
 
         for query in modified_query:  
-            try:                
-                df = math.log(TOTAL_DOCUMENTS / len(GLOBAL_INDEX[query]))
-                wtq = (1 + math.log(tf[query])) * df
-                query_vector.append(wtq)
-            except:
-                query_vector.append(0)
-                
 
-        doc_dictionary = defaultdict(list)
+            query_tfidf = (1 + math.log(tf[query])) * math.log(TOTAL_DOCUMENTS/len(GLOBAL_INDEX[query]))
 
-        for query in modified_query:
-            for d in GLOBAL_INDEX[query]:
-                doc_dictionary[d['DocID']].append(float(d['TFIDF']))
+            for document in GLOBAL_INDEX[query]:
+                Scores[document['DocID']] += query_tfidf * float(document['TFIDF'])
+                Magnitude[document['DocID']] += float(document['TFIDF']) ** 2
+
+        result = defaultdict(float)
+        for doc in Scores:
+            result[doc] = Scores[doc] / math.sqrt(Magnitude[doc])
 
 
-        for k,v in doc_dictionary.items():
+        top20 = sorted(result.items(), key=lambda x: x[1], reverse=True)[:20]
+        top20 = [k for k,v in top20]
 
-            results[k] = 1 - spatial.distance.cosine(query_vector, v)
-
-                # document_vector = []
-                # document_vector.append(int(d['TFIDF']))
-                # # print query_vector, document_vector
-                # rank_result = spatial.distance.cosine(query_vector, document_vector)
-                # results[d['DocID']] += rank_result
-        
-
-        top20 = sorted(results, key=lambda x: x[1], reverse=True)[:20]
-
-        # print top20
         output = []
         for i in top20:
             link = data[i]
@@ -129,22 +98,6 @@ def query(s):
             
             output.append((link,DOCUMENT_INFO[i]))
         return output
-        # return [(data[i],DOCUMENT_INFO[i]) for i in top20]
-
-        # print results
-        # for d in GLOBAL_INDEX[s]:
-        #     results += 1
-        #     if results <= 20:
-        #         output.append(data[d['DocID']])
-                # print "{}. {} \nTF-IDF Score: {}".format(results, data[d['DocID']], d['TFIDF'])
-                # dataFile.write("{}. {}\n".format(results,data[d['DocID']]))
-            # else:
-                # dataFile.write("{}. {}\n".format(results,data[d['DocID']]))
-
-        # print "\nTotal Results found : ", results
-        # dataFile.write("Total Results found : {}\n".format(results))
-        # return output
-
 
 app = Flask(__name__)
 
@@ -157,18 +110,8 @@ def my_form_post():
     text = request.form['text']
     queryResults = query(text.strip())
     return render_template('result.html',result = queryResults)
-    # s = ""
-    # for link, data in queryResults:
-    #     if str(link).startswith('http'):
-    #         s += "<p><a target=\"_blank\" href={}>{}</a></p>".format(link, data['title'])
-    #     else:
-    #         s += "<p><a target=\"_blank\" href={}>{}</a></p>".format("http://" + link,data['title'])
-
-    # return s
 
 if __name__ == '__main__':
     buildIndexFromFile("Index.txt")
     buildDocumentIndexFromFile("Document.txt")
-    # print DOCUMENT_INFO['61/160']
-    # query("computer science")
     app.run()
