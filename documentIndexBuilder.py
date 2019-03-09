@@ -59,7 +59,7 @@ def write_documentInfo_to_file():
     """
     with open("Document.txt", "w") as outFile:
         for k,v in DOCUMENT_INFO.items():
-            outFile.write("{}:title!{}\n".format(k,v['title']))
+            outFile.write("{}:title`{}\n".format(k,v['title']))
 
 if __name__ == "__main__":
     file_traversal()

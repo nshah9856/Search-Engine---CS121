@@ -40,7 +40,7 @@ def buildDocumentIndexFromFile(filename):
             for i in line[1:]:
                 d = dict()
                 for j in i.split(','):
-                    k = j.split('!')
+                    k = j.split('`')
                     if len(k) == 2:
                         d[k[0]] = k[1]
                 
@@ -75,11 +75,15 @@ def query(s):
         Magnitude = defaultdict(float)
 
         for query in modified_query:  
+            l = len(GLOBAL_INDEX[query])
 
-            query_tfidf = (1 + math.log(tf[query])) * math.log(TOTAL_DOCUMENTS/len(GLOBAL_INDEX[query]))
+            query_tfidf = 1 if l == 0 else math.fabs((1 + math.log(tf[query])) * math.log(TOTAL_DOCUMENTS/l))
 
             for document in GLOBAL_INDEX[query]:
-                Scores[document['DocID']] += query_tfidf * float(document['TFIDF'])
+                extra_score = 0
+                # if query in DOCUMENT_INFO[document['DocID']]['title'].split():
+                #     extra_score += 0.01
+                Scores[document['DocID']] += query_tfidf * float(document['TFIDF']) + extra_score
                 Magnitude[document['DocID']] += float(document['TFIDF']) ** 2
 
         result = defaultdict(float)
